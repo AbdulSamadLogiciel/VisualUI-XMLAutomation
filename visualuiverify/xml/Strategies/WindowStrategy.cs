@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Windows.Forms;
 using VisualUIAVerify.XMLAutomation.Constants;
 
@@ -15,7 +16,7 @@ namespace VisualUIAVerify.XMLAutomation.Strategies
         }
 
        
-        public void StrategicXMLGeneration(TreeNode element, StringBuilder xmlBuilder, ref bool isFirstWindow)
+        public void StrategicXMLGeneration(TreeNode element, StringBuilder xmlBuilder, ref bool isFirstWindow, List<string> elementHopper)
         {
 
             var automationElement = UIElements.GetAutomationElement(element);

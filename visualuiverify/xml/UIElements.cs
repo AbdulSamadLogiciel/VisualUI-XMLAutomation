@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Text;
+using System.Web.UI.Design;
 using System.Windows.Automation;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using VisualUIAVerify.Controls;
+using VisualUIAVerify.XMLAutomation.Strategies;
 
 namespace VisualUIAVerify.XMLAutomation
 {
     public class UIElements
     {
-        public UIElements()
-        {
-        }
+       
 
 
         public static bool IsPreviousAndCurrentElementSame(TreeNode element)
@@ -127,6 +129,37 @@ namespace VisualUIAVerify.XMLAutomation
 
             }
             return null;
+        }
+
+        public static bool IsElementHopper(TreeNode node, ref bool isElementHopper)
+        {
+          
+        
+            TreeNodeCollection children = node.Nodes;
+
+            foreach (TreeNode child in children)
+            {
+                var automationElement = GetAutomationElement(child);
+                if (automationElement.Current.AutomationId == "layoutPanelleft")
+                {
+                    var data = child.Text;
+                }
+
+                if (ButtonStrategy.IsButton(child) || TextFieldStrategy.IsText(child))
+                {
+                    isElementHopper = true;
+                    return isElementHopper;
+                }
+
+                IsElementHopper(child, ref isElementHopper);
+
+            }
+            return isElementHopper;
+        }
+        public static bool HasChild(TreeNode element)
+        {
+            TreeNodeCollection nodes = element.Nodes;
+            return nodes.Count > 0;
         }
     }
 
