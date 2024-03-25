@@ -32,6 +32,8 @@ namespace VisualUIAVerify.XMLAutomation
             isFirstText = true;
             isFirstWindow = true;
             isFirstButton = true;
+            isFirstElement = true;
+            isElementHopper = true;
         }
         public static void GenerateXML(TreeNode rootNode)
         {

@@ -145,10 +145,10 @@ namespace VisualUIAVerify.XMLAutomation
                     var data = child.Text;
                 }
 
-                if (ButtonStrategy.IsButton(child) || TextFieldStrategy.IsText(child))
+                if ((ButtonStrategy.IsButton(child) || TextFieldStrategy.IsText(child)) && child.Checked)
                 {
                     isElementHopper = true;
-                    return isElementHopper;
+                    break;
                 }
 
                 IsElementHopper(child, ref isElementHopper);

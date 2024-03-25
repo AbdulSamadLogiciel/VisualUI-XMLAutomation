@@ -24,10 +24,9 @@ namespace VisualUIAVerify.XMLAutomation.Strategies
             xmlBuilder.Append("\r\n<listOfElementHopper>");
             foreach (string item in elementHopper)
             {
-                if (item != "")
-                {
+               
                     xmlBuilder.Append($"<ElementHopper AutomationID=\"{item}\"/>");
-                }
+                
 
             }
             xmlBuilder.Append("\r\n</listOfElementHopper>");
