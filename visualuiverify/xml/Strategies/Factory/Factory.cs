@@ -20,6 +20,8 @@ namespace VisualUIAVerify.xml.Strategies.Factory
                     return new TextFieldStrategy();
                 case UIElementDescriptor.Button:
                     return new ButtonStrategy();
+                case UIElementDescriptor.Label:
+                    return new TextLabelStrategy();
                 default:
                     throw new ArgumentException("Invalid product type");
             }

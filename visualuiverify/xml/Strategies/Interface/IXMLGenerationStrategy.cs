@@ -6,6 +6,6 @@ namespace VisualUIAVerify.XMLAutomation.Strategies
 {
     public interface IXMLGenerationStrategy
     {
-        void StrategicXMLGeneration(TreeNode element, StringBuilder xmlBuilder, ref bool isFirst, List<string> elementHopper);
+        void StrategicXMLGeneration(TreeNode element, StringBuilder xmlBuilder, ref bool isFirst, Stack<TreeNode> elementHopper);
     }
 }

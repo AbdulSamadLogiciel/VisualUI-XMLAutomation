@@ -16,7 +16,7 @@ namespace VisualUIAVerify.XMLAutomation.Strategies
         }
 
        
-        public void StrategicXMLGeneration(TreeNode element, StringBuilder xmlBuilder, ref bool isFirstWindow, List<string> elementHopper)
+        public void StrategicXMLGeneration(TreeNode element, StringBuilder xmlBuilder, ref bool isFirstWindow, Stack<TreeNode> elementHopper)
         {
 
             var automationElement = UIElements.GetAutomationElement(element);

@@ -11,5 +11,6 @@ namespace VisualUIAVerify.XMLAutomation.Constants
         public const string Button = "button";
         public const string Text = "edit";
         public const string Window = "window";
+        public const string Label = "text";
     }
 }

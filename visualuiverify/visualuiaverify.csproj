@@ -158,6 +158,7 @@
     <Compile Include="xml\Strategies\Factory\Factory.cs" />
     <Compile Include="xml\Strategies\TextFieldStrategy.cs" />
     <Compile Include="xml\Strategies\Interface\IXMLGenerationStrategy.cs" />
+    <Compile Include="xml\Strategies\TextLabelStrategy.cs" />
     <Compile Include="xml\Strategies\WindowStrategy.cs" />
     <Compile Include="xml\UIElements.cs" />
     <Compile Include="xml\XMLGenerator.cs" />

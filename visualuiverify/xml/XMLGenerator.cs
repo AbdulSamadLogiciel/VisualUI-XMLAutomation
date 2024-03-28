@@ -1,10 +1,14 @@
 ﻿
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Web.UI.Design;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
+using VisualUIAVerify.xml.Strategies;
 using VisualUIAVerify.xml.Strategies.Factory;
 using VisualUIAVerify.XMLAutomation.Constants;
 using VisualUIAVerify.XMLAutomation.Strategies;
@@ -16,8 +20,12 @@ namespace VisualUIAVerify.XMLAutomation
         private static bool isFirstText = true;
         private static bool isFirstWindow = true;
         private static bool isFirstButton = true;
-        private static bool isFirstElement = true;
+        private static bool isFirstElementUIElement = true;
         public static bool isElementHopper = false;
+        public static bool isFirstLabel = true;
+        public static bool isFirstXMLGenerated = false;
+  
+        private static Stack<TreeNode> elementHopperNode = new Stack<TreeNode>();
         public static void SaveXML(StringBuilder xmlString)
         {
             string relativePath = @"UIAutomation.xml";
@@ -32,20 +40,22 @@ namespace VisualUIAVerify.XMLAutomation
             isFirstText = true;
             isFirstWindow = true;
             isFirstButton = true;
-            isFirstElement = true;
+            isFirstElementUIElement = true;
             isElementHopper = true;
+            isFirstLabel = true;
+            elementHopperNode.Clear();
         }
         public static void GenerateXML(TreeNode rootNode)
         {
             try
             {
-                List<string> elementHopper = new List<string>();
+              
 
                 StringBuilder xmlBuilder = new StringBuilder();
                 xmlBuilder.AppendLine("<EmbeddedControlBase>\n<SubControls>");
 
                 Console.WriteLine("UI Elements:");
-                ParseUIElements(rootNode, xmlBuilder, elementHopper);
+                ParseUIElements(rootNode, xmlBuilder, elementHopperNode);
 
                 if (!isFirstWindow)
                 {
@@ -54,14 +64,14 @@ namespace VisualUIAVerify.XMLAutomation
                 }
                 xmlBuilder.AppendLine("</SubControls>\n</EmbeddedControlBase>");
                 SaveXML(xmlBuilder);
-
+              
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Something went wrong: ${ex.Message}");
             }
         }
-        public static void ParseUIElements(TreeNode node, StringBuilder xmlBuilder, List<string> elementHopper)
+        public static void ParseUIElements(TreeNode node, StringBuilder xmlBuilder, Stack<TreeNode> elementHopper)
         {
            
             GenerateNodeXML(node, xmlBuilder, elementHopper);
@@ -74,9 +84,11 @@ namespace VisualUIAVerify.XMLAutomation
                     ParseUIElements(child, xmlBuilder, elementHopper);
 
             }
-        }
+          
 
-        static void GenerateNodeXML(TreeNode node, StringBuilder xmlBuilder, List<string> elementHopper)
+        }
+     
+        static void GenerateNodeXML(TreeNode node, StringBuilder xmlBuilder, Stack<TreeNode> elementHopper)
         {
             if (node.Checked)
             {
@@ -84,33 +96,47 @@ namespace VisualUIAVerify.XMLAutomation
             }
         }
 
-         static void AppendXML(TreeNode element, StringBuilder xmlBuilder, List<string> elementHopper)
+      
+
+        static void AppendXML(TreeNode element, StringBuilder xmlBuilder, Stack<TreeNode> elementHopper)
         {
 
-           
-            if (UIElements.IsElementHopper(element, ref isElementHopper) && !isFirstElement)
-            {
-                var automationElement = UIElements.GetAutomationElement(element);
-                elementHopper.Add(automationElement.Current.AutomationId);
+            if (elementHopperNode.Count > 0 && !element.Parent.Equals(elementHopperNode.Peek()) && !isFirstElementUIElement)
+            {        
+                elementHopperNode.Pop();
             }
-       
+
+            if (UIElements.IsElementHopper(element))
+            {
+                    elementHopper.Push(element);
+            }
+
             if (!UIElements.IsPreviousAndCurrentElementSame(element) && ButtonStrategy.IsButton(element))
             {
                 isFirstButton = true;
             }
-
-
             if (!UIElements.IsPreviousAndCurrentElementSame(element) && TextFieldStrategy.IsText(element))
             {
                 isFirstText = true;
-            }           
+            }
+            if (!UIElements.IsPreviousAndCurrentElementSame(element) && TextLabelStrategy.IsLabel(element))
+            {
+                isFirstLabel = true;
+            }
+
+            ExecuteStrategy(element, xmlBuilder, elementHopper);
+            isFirstElementUIElement = false;
+            
+        }
+        public static void ExecuteStrategy(TreeNode element, StringBuilder xmlBuilder, Stack<TreeNode> elementHopper)
+        {
 
             if (WindowStrategy.IsWindow(element))
             {
                 IXMLGenerationStrategy strategy = Factory.CreateStrategy(UIElementDescriptor.Window);
                 strategy.StrategicXMLGeneration(element, xmlBuilder, ref isFirstWindow, elementHopper);
             }
-            else 
+            else
             if (ButtonStrategy.IsButton(element) && !UIElements.HasChild(element))
             {
                 IXMLGenerationStrategy strategy = Factory.CreateStrategy(UIElementDescriptor.Button);
@@ -121,11 +147,16 @@ namespace VisualUIAVerify.XMLAutomation
             {
                 IXMLGenerationStrategy strategy = Factory.CreateStrategy(UIElementDescriptor.Text);
                 strategy.StrategicXMLGeneration(element, xmlBuilder, ref isFirstText, elementHopper);
-            }
-            isFirstElement = false;
-            isElementHopper = false;
-        }
 
+            }
+            else
+            if (TextLabelStrategy.IsLabel(element) && !UIElements.HasChild(element))
+            {
+                IXMLGenerationStrategy strategy = Factory.CreateStrategy(UIElementDescriptor.Label);
+                strategy.StrategicXMLGeneration(element, xmlBuilder, ref isFirstLabel, elementHopper);
+
+            }
+        }
         static string BeautifyXml(string xml)
         {
             try

@@ -5,6 +5,7 @@ using System.Windows.Automation;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using VisualUIAVerify.Controls;
+using VisualUIAVerify.xml.Strategies;
 using VisualUIAVerify.XMLAutomation.Strategies;
 
 namespace VisualUIAVerify.XMLAutomation
@@ -130,7 +131,7 @@ namespace VisualUIAVerify.XMLAutomation
             }
             return null;
         }
-
+        /*
         public static bool IsElementHopper(TreeNode node, ref bool isElementHopper)
         {
           
@@ -145,7 +146,7 @@ namespace VisualUIAVerify.XMLAutomation
                     var data = child.Text;
                 }
 
-                if ((ButtonStrategy.IsButton(child) || TextFieldStrategy.IsText(child)) && child.Checked)
+                if ((ButtonStrategy.IsButton(child) || TextFieldStrategy.IsText(child) || TextLabelStrategy.IsLabel(child)) && child.Checked)
                 {
                     isElementHopper = true;
                     break;
@@ -155,11 +156,37 @@ namespace VisualUIAVerify.XMLAutomation
 
             }
             return isElementHopper;
-        }
+        }*/
         public static bool HasChild(TreeNode element)
         {
             TreeNodeCollection nodes = element.Nodes;
             return nodes.Count > 0;
+        }
+
+        public static object IsInvokePattern(AutomationElement element)
+        {
+            object patternObj;
+            if (element.TryGetCurrentPattern(InvokePattern.Pattern, out patternObj))
+            {
+                return patternObj;
+               
+            }
+            return null;
+        }
+        public static ValuePattern IsValuePattern(AutomationElement element)
+        {
+            object patternObj;
+            if (element.TryGetCurrentPattern(ValuePattern.Pattern, out patternObj))
+            {
+                return patternObj as ValuePattern;
+            }
+            return null;
+        }
+
+        public static bool IsElementHopper(TreeNode node)
+        { 
+           TreeNodeCollection children = node.Nodes;
+           return children.Count > 0;   
         }
     }
 
